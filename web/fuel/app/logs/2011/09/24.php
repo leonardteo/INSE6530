@@ -14,3 +14,4 @@ Debug - 2011-09-24 15:37:45 --> testing log debug
 Error - 2011-09-24 15:37:45 --> testing log error
 Debug - 2011-09-24 15:37:46 --> Log::debug - testing log debug
 Error - 2011-09-24 15:37:46 --> Log::error - testing log error
+Error - 2011-09-24 16:00:16 --> Error - Call to undefined method Fuel\Core\View::forge() in /Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/classes/controller/home.php on line 16
