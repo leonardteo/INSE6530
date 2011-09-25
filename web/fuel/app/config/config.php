@@ -126,7 +126,7 @@ return array(
 		/**
 		 * Whether to automatically encode (htmlentities) view data
 		 */
-		'auto_encode_view_data'	=> true,
+		'auto_encode_view_data'	=> false,
 
 		/**
 		 * With output encoding switched on all objects passed will be converted to strings or

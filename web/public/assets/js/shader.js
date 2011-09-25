@@ -1,17 +1,22 @@
 /***
-* Shader class
+* Shader Program class
 * A single shader that contains a vertex and fragment shader
 * @author Leonard Teo
 **/
 
-
+/**
+ * Main Shader definition & constructor
+ */
 function Shader(glContext){
 	if (!glContext){
-		console.log("No GL Context sent to shader");
+		console.error("No GL Context sent to shader");
 		return;
 	}
+	
+	//Initialize properties
 	this.gl = glContext;
 	this.program = this.gl.createProgram();
+	this.programReady = false;	//Flag to check if the program is compiled and linked
 }
 
 /**
@@ -20,15 +25,15 @@ function Shader(glContext){
 Shader.prototype.link = function(){
 	
 	if (!this.vertexShader){
-		console.log("Vertex shader missing");
+		console.error("Vertex shader missing");
 		return false;
 	}
 	if (!this.fragmentShader){
-		console.log("Fragment shader missing");
+		console.error("Fragment shader missing");
 		return false;
 	}
 	if (!this.program){
-		console.log("No shader program initialized. Did you pass the GL Context?");
+		console.error("No shader program initialized. Did you pass the GL Context?");
 		return false;
 	}
 
@@ -40,9 +45,10 @@ Shader.prototype.link = function(){
     this.gl.linkProgram(this.program);
 
     if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
-        console.log("Could not initialise shaders");
+        console.error("Could not initialise shaders");
     }
 	
+	this.programReady = true;
 	return true;
 }
 
@@ -51,7 +57,7 @@ Shader.prototype.link = function(){
 * Compiles and attaches a vertex shader
 **/
 Shader.prototype.compileVertexShader = function(url){
-	this.vertexShader = this.getShader(url, "vertex");
+	this.vertexShader = this.getAndCompileShader(url, "vertex");
 	return this.vertexShader ? true : false;
 }
 
@@ -59,27 +65,28 @@ Shader.prototype.compileVertexShader = function(url){
 * Compiles and attaches a fragment shader
 **/
 Shader.prototype.compileFragmentShader = function(url){
-	this.fragmentShader = this.getShader(url, "fragment");
+	this.fragmentShader = this.getAndCompileShader(url, "fragment");
 	return this.fragmentShader ? true : false;
 }
 
 /**
 * Gets and compiles a vertex or fragment shader
 **/
-Shader.prototype.getShader = function(url, type){
+Shader.prototype.getAndCompileShader = function(url, type){
 
 	if (!url || !type){
-		console.log("No URL or Type")
+		console.error("No URL or Type")
 		return null;
 	}
 	
 	//Create a new HTTP request
 	var request = new XMLHttpRequest();
 	if (!request){
-		console.log("Couldn't instantiate XMLHttpRequest!");
+		console.error("Couldn't instantiate XMLHttpRequest!");
 		return null;
 	}
 
+	//Get the text source from the shader
 	request.open("GET", url, false);
 	request.send(null);
 	var shaderString = request.responseText;
@@ -100,11 +107,23 @@ Shader.prototype.getShader = function(url, type){
 	gl.compileShader(shader);
 	
 	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		console.log("Error compiling shader");
-		console.log(gl.getShaderInfoLog(shader));
+		console.error("Error compiling shader");
+		console.error(gl.getShaderInfoLog(shader));
 		return null;
 	}
 	
+	//Return the shader
 	return shader;
 	
+}
+
+/**
+ * Get the program
+ */
+Shader.prototype.getProgram = function(){
+	if (this.programReady){
+		return this.program;
+	}
+	console.error("Shader program not compiled/linked");
+	return false;
 }
