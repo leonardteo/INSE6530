@@ -87,3 +87,10 @@ MatrixStack.prototype.rotate = function(angle, axis){
 MatrixStack.prototype.translate = function(vec){
 	mat4.translate(this.m[this.m.length-1], vec);
 }
+
+/**
+ * Perspective Matrix
+ */
+MatrixStack.prototype.perspective = function(fovy, aspect, znear, zfar){
+	mat4.perspective(fovy, aspect, znear, zfar, this.m[this.m.length-1]);
+}

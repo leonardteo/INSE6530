@@ -98,36 +98,6 @@
 		jQuery('#status').append("<li>" + text + "</li>");
 	}
 
-	//Global Matrices
-    var mvMatrix = mat4.create();
-    var mvMatrixStack = [];
-    var pMatrix = mat4.create();
-
-    function mvPushMatrix() {
-        var copy = mat4.create();
-        mat4.set(mvMatrix, copy);
-        mvMatrixStack.push(copy);
-    }
-
-    function mvPopMatrix() {
-        if (mvMatrixStack.length == 0) {
-            throw "Invalid popMatrix!";
-        }
-        mvMatrix = mvMatrixStack.pop();
-    }
-
-
-    function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-    }
-
-
-    function degToRad(degrees) {
-        return degrees * Math.PI / 180;
-    }
-
-
 	/**
 	 * Set up the meshes - push into the video card buffers
 	 */
@@ -284,7 +254,8 @@
 
 		
 		//Set up projection matrix
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+		projectionMatrix = new MatrixStack();
+		projectionMatrix.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
 		
 		
 		//Set up ModelView Matrix
@@ -293,12 +264,6 @@
 		modelViewMatrix.push();
 		modelViewMatrix.rotate(rPyramid, [0, 1, 0]);
 		
-        //mat4.identity(mvMatrix);
-
-        //mat4.translate(mvMatrix, [-1.5, 0.0, -8.0]);
-
-        //mvPushMatrix();
-        //mat4.rotate(mvMatrix, degToRad(rPyramid), [0, 1, 0]);
 
 		//Draw the pyramid
         gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
@@ -307,23 +272,19 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexColorBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, pyramidVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        //setMatrixUniforms();
-		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        //Send Matrices to shader
+		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projectionMatrix.getTopMatrix());
         gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, modelViewMatrix.getTopMatrix());
 		
         gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems);
 
-        //mvPopMatrix();
+        //Position the camera
 		modelViewMatrix.pop();
 
 		modelViewMatrix.translate([3.0, 0.0, 0.0]);
 		modelViewMatrix.push();
 		modelViewMatrix.rotate(rCube, [1, 1, 1]);
 		
-        //mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
-        //mvPushMatrix();
-        //mat4.rotate(mvMatrix, degToRad(rCube), [1, 1, 1]);
-
 		//Draw cube
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -332,9 +293,9 @@
         gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cubeVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-        //setMatrixUniforms();
-		
-		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        
+		//Send matrices to shader		
+		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projectionMatrix.getTopMatrix());
         gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, modelViewMatrix.getTopMatrix());
 		
         gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
