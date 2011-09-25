@@ -27,6 +27,8 @@
 	//Global variables
 	var gl;
     var shaderProgram;
+	
+	var cubeNode;
 
 	/**
 	 * Main function 
@@ -48,6 +50,11 @@
             updateStatus("Could not initialize webgl. Do you have a WebGL enabled browser?")
 			return;
         }
+		
+		
+		//Create a cube node
+		cubeNode = new MeshNode();
+		
 		
 		//Initialize shaders
 		shader = new Shader(gl);
@@ -162,7 +169,7 @@
         pyramidVertexColorBuffer.itemSize = 4;
         pyramidVertexColorBuffer.numItems = 12;
 
-
+		//Define cube
         cubeVertexPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
         vertices = [
@@ -286,20 +293,8 @@
 		modelViewMatrix.rotate(rCube, [1, 1, 1]);
 		
 		//Draw cube
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cubeVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-        
-		//Send matrices to shader		
-		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projectionMatrix.getTopMatrix());
-        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, modelViewMatrix.getTopMatrix());
+		cubeNode.draw(projectionMatrix, modelViewMatrix);
 		
-        gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-
         //mvPopMatrix();
 		modelViewMatrix.pop();
 

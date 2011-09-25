@@ -20,6 +20,8 @@
 		<script src="/assets/js/matrixstack.js"></script>
 		<script src="/assets/js/scenegraph.js"></script>
 		<script src="/assets/js/shader.js"></script>
+		<script src="/assets/js/node.js"></script>
+		<script src="/assets/js/meshnode.js"></script>
 		
 		<!-- CSS -->
 		<link href="/assets/css/styles.css" rel="stylesheet" type="text/css" />
