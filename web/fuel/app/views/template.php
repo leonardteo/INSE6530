@@ -22,6 +22,7 @@
 		<script src="/assets/js/shader.js"></script>
 		<script src="/assets/js/node.js"></script>
 		<script src="/assets/js/meshnode.js"></script>
+		<script src="/assets/js/texture.js"></script>
 		
 		<!-- CSS -->
 		<link href="/assets/css/styles.css" rel="stylesheet" type="text/css" />

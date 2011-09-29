@@ -1,21 +1,17 @@
 /***
 * Shader Program class
 * A single shader that contains a vertex and fragment shader
+* Note: requires global gl context var gl to be initialized 
 * @author Leonard Teo
 **/
 
 /**
  * Main Shader definition & constructor
  */
-function Shader(glContext){
-	if (!glContext){
-		console.error("No GL Context sent to shader");
-		return;
-	}
+function Shader(){
 	
 	//Initialize properties
-	this.gl = glContext;
-	this.program = this.gl.createProgram();
+	this.program = gl.createProgram();
 	this.programReady = false;	//Flag to check if the program is compiled and linked
 }
 
@@ -38,13 +34,13 @@ Shader.prototype.link = function(){
 	}
 
 	//Attach the shaders
-    this.gl.attachShader(this.program, this.vertexShader);
-    this.gl.attachShader(this.program, this.fragmentShader);
+    gl.attachShader(this.program, this.vertexShader);
+    gl.attachShader(this.program, this.fragmentShader);
 
 	//Link the programs
-    this.gl.linkProgram(this.program);
+    gl.linkProgram(this.program);
 
-    if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
         console.error("Could not initialise shaders");
     }
 	

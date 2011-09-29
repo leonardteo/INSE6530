@@ -10,7 +10,7 @@
  * @link       http://fuelphp.com
  */
 
-define('ASSETS_PATH', APPPATH."../public/assets/");
+define('ASSETS_PATH', APPPATH."../../public/assets/");
 
 return array(
 

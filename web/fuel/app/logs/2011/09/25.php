@@ -1,0 +1,7 @@
+<?php defined('COREPATH') or exit('No direct script access allowed'); ?>
+
+Error - 2011-09-25 23:52:48 --> 2 - file(/Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/../public/assets/shaders/) [<a href='function.file'>function.file</a>]: failed to open stream: No such file or directory in /Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/classes/objmodel.php on line 55
+Error - 2011-09-25 23:52:48 --> Error - Couldn't read file /Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/../public/assets/shaders/ in /Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/classes/objmodel.php on line 58
+Error - 2011-09-25 23:54:30 --> 2 - file(/Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/../public/assets/models/cube.obj) [<a href='function.file'>function.file</a>]: failed to open stream: No such file or directory in /Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/classes/objmodel.php on line 55
+Error - 2011-09-25 23:54:30 --> Error - Couldn't read file /Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/../public/assets/models/cube.obj in /Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/classes/objmodel.php on line 58
+Error - 2011-09-25 23:55:10 --> 2 - file(/Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/../public/assets/models/cube.obj) [<a href='function.file'>function.file</a>]: failed to open stream: No such file or directory in /Users/leonardteo/Documents/webprojects/INSE6530/web/fuel/app/classes/objmodel.php on line 55

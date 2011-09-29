@@ -1,12 +1,29 @@
-attribute vec3 aVertexPosition;
-attribute vec4 aVertexColor;
+//Vertex Shader
 
-uniform mat4 uMVMatrix;
-uniform mat4 uPMatrix;
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+attribute vec2 aUV;
+
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
+uniform mat3 uNormalMatrix;
 
 varying vec4 vColor;
+varying vec3 vNormal;	//varying normal to interpolate
+varying vec3 vVertexPosition;
+varying vec2 vUV;		//Interpolated UV's
 
 void main(void) {
-	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-	vColor = aVertexColor;
+	
+	//Calculate the normal for automatic interpolation
+	vNormal = uNormalMatrix * aVertexNormal;
+	
+	//Calculate vertex position in eye space
+	vVertexPosition = vec3(uModelViewMatrix * vec4(aVertexPosition, 1));
+	
+	//UV
+	vUV = aUV;
+	
+	//Send the vertex position out
+	gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);	
 }
