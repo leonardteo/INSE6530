@@ -1,3 +1,7 @@
+body {
+	font-family: arial, sans-serif;
+}
+
 
 /**
 Status - looks like a terminal
@@ -12,3 +16,4 @@ ul#status {
 	border-radius: 5px;
 	line-height: 1.5;
 }
+

@@ -7,8 +7,19 @@
 <h1>Hello WebGL</h1>
 
 <canvas id="webgl_canvas" style="border: none;" width="640" height="640"></canvas>
+
+<div style="padding-top:10px;">
+	<label>Select a model to view:</label>
+	<select id="model">
+		<option value="quakeplasma">Quake Plasma Rifle</option>
+		<option value="m1abrams">M1 Abrams Tank</option>
+		<option value="humveehardtop">Humvee</option>
+		<option value="uhtiger">UH Tiger Helicopter</option>
+	</select>
+</div>
+
 <div>
-	Status:
+	<h2>Status:</h2>
 	<ul id="status">
 	</ul>
 </div>
@@ -17,11 +28,6 @@
 
 <script type="text/javascript">
 
-	//Start webGL when the DOM is ready...
-	jQuery(document).ready(function(){
-		main();
-	});
-	
 	//Global variables
 	var gl;	//OpenGL context
 	
@@ -30,6 +36,41 @@
 	var cubeRotation = 0;
 	
 	var lastTime = 0;	
+	
+	
+	//Start webGL when the DOM is ready...
+	jQuery(document).ready(function(){
+		main();
+		
+		jQuery('#model').change(function(obj){
+			model = jQuery('#model').val();
+			
+			switch(model){
+				case 'm1abrams':
+					cubeNode = new MeshNode();
+					cubeNode.loadOBJModel("/assets/models/json/m1abrams.json");
+					cubeNode.loadTexture("/assets/textures/m1abrams.jpg")
+					break;
+				case 'humveehardtop':
+					cubeNode = new MeshNode();
+					cubeNode.loadOBJModel("/assets/models/json/humveehardtop.json");
+					cubeNode.loadTexture("/assets/textures/humveehardtop.jpg")
+					break;
+				case 'uhtiger':
+					cubeNode = new MeshNode();
+					cubeNode.loadOBJModel("/assets/models/json/uhtiger.json");
+					cubeNode.loadTexture("/assets/textures/uhtiger.jpg")
+					break;
+				default:
+					cubeNode = new MeshNode();
+					cubeNode.loadOBJModel("/assets/models/json/quakeplasma.json");
+					cubeNode.loadTexture("/assets/textures/quakeplasma.jpg")
+					
+			}
+			
+		});
+		
+	});	
 
 	/**
 	 * Main function 
@@ -94,7 +135,8 @@
 		
 		//Set up ModelView Matrix
 		modelViewMatrix = new MatrixStack();
-		modelViewMatrix.translate([0.0, -2.0, -20.0]);
+		modelViewMatrix.translate([0.0, -3.0, -20.0]);
+		modelViewMatrix.rotate(20.0, [1,0,0]);
 		modelViewMatrix.rotate(cubeRotation, [0, 1, 0]);
 		
 		//Draw cube
@@ -114,7 +156,7 @@
         if (lastTime != 0) {
             var elapsed = timeNow - lastTime;
 
-            cubeRotation -= (75 * elapsed) / 1000.0;
+            cubeRotation -= (75 * elapsed) / 2000.0;
         }
         lastTime = timeNow;
     }
