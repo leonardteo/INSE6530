@@ -4,7 +4,7 @@ precision highp float;
 
 varying vec3 vNormal;
 varying vec3 vVertexPosition;
-varying vec2 vUV;
+varying vec2 vTextureCoord;
 
 uniform sampler2D uSampler;
 
@@ -19,17 +19,29 @@ void main(void) {
 	
 	//Calculate the lighting direction
 	vec3 lightDirection = normalize(lightPosition - vVertexPosition);
+	
+	//Calculate the eyedirection half vector for blinn-phong shading
+	vec3 eyeDirection = normalize(-vVertexPosition);	//I'm not sure why this works.
+	vec3 halfVector = normalize(lightDirection + eyeDirection);
 
 	//Base color of the object
 	//vec4 color = vec4(0.75, 0.75, 0.75, 1.0);
-	vec4 color = texture2D(uSampler, vec2(vUV.s, vUV.t));
+	vec4 color = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
 	
-	vec3 diffuseTerm = color.rgb * clamp(dot(lightDirection, normal), 0.0, 1.0);
+	//Calculate diffuse term
+	vec4 diffuseTerm = vec4(color.rgb * clamp(dot(lightDirection, normal), 0.0, 1.0), 1.0);	//Forcing the alpha to 1.0 so it's not affected by lighting
 	
 	//No texture
 	//diffuseTerm = vec3(1.0, 1.0, 1.0) * clamp(dot(lightDirection, normal), 0.0, 1.0);
 	
-    gl_FragColor = vec4(diffuseTerm.rgb, 1.0);
+	//Calculate specular term
+	vec4 materialSpecularColor = vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 lightSpecularColor = vec4(1.0, 1.0, 1.0, 1.0);
+	float shininess = 200.0;
+	vec4 specularTerm = materialSpecularColor * lightSpecularColor * pow( max(dot(normal, halfVector), 0.0), shininess);
+	
+	
+    gl_FragColor = diffuseTerm + specularTerm;
 	
 	//gl_FragColor = diffuseTerm;
 	

@@ -7,12 +7,20 @@
 
 /**
  * Main Shader definition & constructor
+ * @param string vertexShader source file
+ * @param string fragmentShader source file
  */
-function Shader(){
+function Shader(vertexShader, fragmentShader){
 	
 	//Initialize properties
 	this.program = gl.createProgram();
 	this.programReady = false;	//Flag to check if the program is compiled and linked
+	
+	//Compile and link shaders
+	this.compileVertexShader(vertexShader);
+	this.compileFragmentShader(fragmentShader);
+	
+	return this.link();
 }
 
 /**
@@ -44,8 +52,83 @@ Shader.prototype.link = function(){
         console.error("Could not initialise shaders");
     }
 	
-	this.programReady = true;
+	this.initShaderVars();
+	
+	//Set this programReady flag to true
+	this.programReady = true;	
+	
 	return true;
+}
+
+/**
+ * Sets up shader variables
+ */
+Shader.prototype.initShaderVars = function(){
+	//Setup shader vars
+	gl.useProgram(this.program);
+	
+	//Get the vertex position attribute
+	this.program.vertexPositionAttribute = gl.getAttribLocation(this.program, "aVertexPosition");
+	gl.enableVertexAttribArray(this.program.vertexPositionAttribute);
+	
+	//Get the vertex normal attribute
+	this.program.vertexNormalAttribute = gl.getAttribLocation(this.program, "aVertexNormal");
+	gl.enableVertexAttribArray(this.program.vertexNormalAttribute);
+
+	//Get the texture coordinate attribute
+	this.program.textureCoordAttribute = gl.getAttribLocation(this.program, "aTextureCoord");
+	gl.enableVertexAttribArray(this.program.textureCoordAttribute);
+
+	//Get uniforms
+	//this.program.samplerUniform = gl.getUniformLocation(this.program, "uSampler");
+	this.program.projectionMatrixUniform = gl.getUniformLocation(this.program, "uProjectionMatrix");
+	this.program.modelViewMatrixUniform = gl.getUniformLocation(this.program, "uModelViewMatrix");
+	this.program.normalMatrixUniform = gl.getUniformLocation(this.program, "uNormalMatrix");
+	this.program.samplerUniform = gl.getUniformLocation(this.program, "uSampler");
+}
+
+/**
+ * Sets the uniform data by pushing it to the shader
+ */
+Shader.prototype.setUniforms = function(projectionMatrixStack, modelViewMatrixStack){
+
+	//Set the texture sampler
+	//gl.uniform1i(this.program.samplerUniform, 0);	//DO WE REALLY NEED THIS?
+	
+	//Projection Matrix
+	gl.uniformMatrix4fv(this.program.projectionMatrixUniform, false, projectionMatrixStack.getTopMatrix());
+	
+	//ModelViewMatrix
+	gl.uniformMatrix4fv(this.program.modelViewMatrixUniform, false, modelViewMatrixStack.getTopMatrix());
+	
+	//Calculate normal matrix
+	normalMatrix = mat3.create();
+	mat4.toInverseMat3(modelViewMatrixStack.getTopMatrix(), normalMatrix);
+	mat3.transpose(normalMatrix);
+		
+	gl.uniformMatrix3fv(this.program.normalMatrixUniform, false, normalMatrix);
+}
+
+/**
+ * Sets the attributes on the shader
+ */
+Shader.prototype.setAttributes = function(vertexBuffer, textureCoordBuffer, normalBuffer, indexBuffer){
+
+	//Send vertex position to the shader for drawing
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+	gl.vertexAttribPointer(this.program.vertexPositionAttribute, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+	//Send UVs
+	gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+	gl.vertexAttribPointer(this.program.textureCoordAttribute, textureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0)
+
+	//Send normals
+	gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+	gl.vertexAttribPointer(this.program.vertexNormalAttribute, normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+	//Send index
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+	
 }
 
 

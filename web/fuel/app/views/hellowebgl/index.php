@@ -48,21 +48,25 @@
 			switch(model){
 				case 'm1abrams':
 					cubeNode = new MeshNode();
+					cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 					cubeNode.loadOBJModel("/assets/models/json/m1abrams.json");
 					cubeNode.loadTexture("/assets/textures/m1abrams.jpg")
 					break;
 				case 'humveehardtop':
 					cubeNode = new MeshNode();
+					cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 					cubeNode.loadOBJModel("/assets/models/json/humveehardtop.json");
 					cubeNode.loadTexture("/assets/textures/humveehardtop.jpg")
 					break;
 				case 'uhtiger':
 					cubeNode = new MeshNode();
+					cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 					cubeNode.loadOBJModel("/assets/models/json/uhtiger.json");
 					cubeNode.loadTexture("/assets/textures/uhtiger.jpg")
 					break;
 				default:
 					cubeNode = new MeshNode();
+					cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 					cubeNode.loadOBJModel("/assets/models/json/quakeplasma.json");
 					cubeNode.loadTexture("/assets/textures/quakeplasma.jpg")
 					
@@ -99,6 +103,7 @@
 		
 		//Create a cube node
 		cubeNode = new MeshNode();
+		cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 		cubeNode.loadOBJModel("/assets/models/json/quakeplasma.json");
 		cubeNode.loadTexture("/assets/textures/quakeplasma.jpg")
 		
@@ -130,20 +135,20 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
 		//Set up projection matrix
-		projectionMatrix = new MatrixStack();
-		projectionMatrix.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);		
+		projectionMatrixStack = new MatrixStack();
+		projectionMatrixStack.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);		
 		
 		//Set up ModelView Matrix
-		modelViewMatrix = new MatrixStack();
-		modelViewMatrix.translate([0.0, -3.0, -20.0]);
-		modelViewMatrix.rotate(20.0, [1,0,0]);
-		modelViewMatrix.rotate(cubeRotation, [0, 1, 0]);
+		modelViewMatrixStack = new MatrixStack();
+		modelViewMatrixStack.translate([0.0, -3.0, -20.0]);
+		modelViewMatrixStack.rotate(20.0, [1,0,0]);
+		modelViewMatrixStack.rotate(cubeRotation, [0, 1, 0]);
 		
 		//Draw cube
-		cubeNode.render(projectionMatrix, modelViewMatrix);
+		cubeNode.render(projectionMatrixStack, modelViewMatrixStack);
 		
         //mvPopMatrix();
-		modelViewMatrix.pop();
+		modelViewMatrixStack.pop();
 
     }
 
