@@ -17,3 +17,6 @@ ul#status {
 	line-height: 1.5;
 }
 
+ul#status > li {
+	list-style: none;
+}

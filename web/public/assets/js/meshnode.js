@@ -4,25 +4,52 @@
  * @todo - somehow abstract it so that we can pass the gl context in?
  */
 
+/**
+ * Constructor
+ */
 function MeshNode(id){
 	
-	this.id = id;
-
+	//Call the parent constructor
+	Node.call(this, id);
+	
 }
 
-//Set parent node
+//Inherit the node
 MeshNode.prototype = new Node();
+
+//Set the constructor to this
+MeshNode.prototype.constructor = MeshNode;
 
 /**
  * Render the mesh to the opengl context
- * Note: For convenience, we pass the MatrixStack in and take the top matrix
- * when rendering
- * 
- * @param MatrixStack projectionMatrix
- * @param MatrixStack modelViewMatrix
  */
-MeshNode.prototype.render = function(projectionMatrixStack, modelViewMatrixStack){
+MeshNode.prototype.render = function(){
 	
+	if (debug) console.log("Rendering " + this.id);
+	
+	this.sceneGraph.modelViewMatrixStack.push();
+	
+	//Do a model transform
+	this.modelTransform();
+	
+	//Render any children....
+	if (this.childNodes.length > 0){	//Need this or Javascript goes into an endless loop!
+		for (var i=0; i<this.childNodes.length; i++){
+			this.childNodes[i].render();
+		}
+	}
+	
+	//Draw the model
+	this.draw();
+	
+	this.sceneGraph.modelViewMatrixStack.pop();
+}
+
+/**
+ * The actual draw code
+ */
+MeshNode.prototype.draw = function(){
+
 	//Set the shader program to use
 	gl.useProgram(this.shader.getProgram());
 	
@@ -31,82 +58,28 @@ MeshNode.prototype.render = function(projectionMatrixStack, modelViewMatrixStack
 	gl.bindTexture(gl.TEXTURE_2D, this.texture.gltexture);
    
 	//Sent attributes to shader
-	this.shader.setAttributes(this.vertexBuffer, this.textureCoordBuffer, this.normalBuffer, this.indexBuffer);
+	this.shader.setAttributes(this.mesh.vertexBuffer, this.mesh.textureCoordBuffer, this.mesh.normalBuffer, this.mesh.indexBuffer);
 	
 	//Send matrices to shader	
-	this.shader.setUniforms(projectionMatrixStack, modelViewMatrixStack);
+	this.shader.setUniforms(this.sceneGraph.projectionMatrixStack, this.sceneGraph.modelViewMatrixStack);
 	
 	//Draw
-	gl.drawElements(gl.TRIANGLES, this.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-	
+	gl.drawElements(gl.TRIANGLES, this.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+		
+}
+
+/**
+ * Attach an obj model
+ */
+MeshNode.prototype.attachMesh = function(mesh){
+	this.mesh = mesh;
 }
 
 /**
  * Load an OBJ json model
  */
-MeshNode.prototype.loadOBJModel = function(model){
-	
-	//data = {};
-	//data.file = model;
-	
-	var vertexBuffer;
-	var indexBuffer;
-	var textureCoordBuffer;
-	var normalBuffer;
-	
-	
-	jQuery.ajax({
-		async: false,
-		//data: data,
-		dataType: 'json',
-		url: model,
-		success: function(response, textStatus, jqXHR){
-			
-			console.log("OBJ Response from server");
-			console.debug(response);
-		
-			//Load into buffers
-			//Load vertices into buffer
-			vertexBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(response.vertex_array), gl.STATIC_DRAW);
-			vertexBuffer.itemSize = 3;	//3 values per point x, y, z
-			vertexBuffer.numItems = response.index_array.length; //24 values that make up cube
-
-			//Load index into buffer
-			indexBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(response.index_array), gl.STATIC_DRAW);
-			indexBuffer.itemSize = 1;
-			indexBuffer.numItems = response.index_array.length;
-			
-			//Load texture coordinate buffer
-			textureCoordBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(response.uv_array), gl.STATIC_DRAW);
-			textureCoordBuffer.itemSize = 2;
-			textureCoordBuffer.numItems = response.uv_array.length;
-			
-			//Load normalsBuffer
-			normalBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(response.normals_array), gl.STATIC_DRAW);
-			normalBuffer.itemSize = 3;
-			normalBuffer.numItems = response.index_array.length;
-			
-			
-		}, 
-		error: function(jqXHR, textStatus, errorThrown){
-			
-		}
-		
-	});
-	
-	this.vertexBuffer = vertexBuffer;
-	this.indexBuffer = indexBuffer;
-	this.normalBuffer = normalBuffer;
-	this.textureCoordBuffer = textureCoordBuffer;
-	
+MeshNode.prototype.loadMesh = function(model){
+	this.mesh = new Mesh(model);
 }
 
 /**

@@ -4,7 +4,7 @@
 
 function Texture(filename){
 	
-	texture = gl.createTexture();
+	var texture = gl.createTexture();
 	texture.image = new Image();
 	texture.image.onload = function () {
 		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);

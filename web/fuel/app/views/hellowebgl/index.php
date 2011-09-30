@@ -31,11 +31,14 @@
 	//Global variables
 	var gl;	//OpenGL context
 	
-	
-	var cubeNode;
+	var sceneGraph;
+	var model;
 	var cubeRotation = 0;
+	var camera;
 	
 	var lastTime = 0;	
+	
+	var debug = false;	//ugh/
 	
 	
 	//Start webGL when the DOM is ready...
@@ -43,32 +46,32 @@
 		main();
 		
 		jQuery('#model').change(function(obj){
-			model = jQuery('#model').val();
+			modelName = jQuery('#model').val();
 			
-			switch(model){
+			switch(modelName){
 				case 'm1abrams':
-					cubeNode = new MeshNode();
-					cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
-					cubeNode.loadOBJModel("/assets/models/json/m1abrams.json");
-					cubeNode.loadTexture("/assets/textures/m1abrams.jpg")
+					model = new MeshNode("model");
+					model.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
+					model.loadMesh("/assets/models/json/m1abrams.json");
+					model.loadTexture("/assets/textures/m1abrams.jpg")
 					break;
 				case 'humveehardtop':
-					cubeNode = new MeshNode();
-					cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
-					cubeNode.loadOBJModel("/assets/models/json/humveehardtop.json");
-					cubeNode.loadTexture("/assets/textures/humveehardtop.jpg")
+					model = new MeshNode("model");
+					model.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
+					model.loadMesh("/assets/models/json/humveehardtop.json");
+					model.loadTexture("/assets/textures/humveehardtop.jpg")
 					break;
 				case 'uhtiger':
-					cubeNode = new MeshNode();
-					cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
-					cubeNode.loadOBJModel("/assets/models/json/uhtiger.json");
-					cubeNode.loadTexture("/assets/textures/uhtiger.jpg")
+					model = new MeshNode("model");
+					model.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
+					model.loadMesh("/assets/models/json/uhtiger.json");
+					model.loadTexture("/assets/textures/uhtiger.jpg")
 					break;
 				default:
-					cubeNode = new MeshNode();
-					cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
-					cubeNode.loadOBJModel("/assets/models/json/quakeplasma.json");
-					cubeNode.loadTexture("/assets/textures/quakeplasma.jpg")
+					model = new MeshNode("model");
+					model.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
+					model.loadMesh("/assets/models/json/quakeplasma.json");
+					model.loadTexture("/assets/textures/quakeplasma.jpg")
 					
 			}
 			
@@ -101,13 +104,42 @@
 		//Enable depth testing for 3D
 		gl.enable(gl.DEPTH_TEST);
 		
-		//Create a cube node
-		cubeNode = new MeshNode();
-		cubeNode.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
-		cubeNode.loadOBJModel("/assets/models/json/quakeplasma.json");
-		cubeNode.loadTexture("/assets/textures/quakeplasma.jpg")
 		
-		//initTexture("/assets/textures/quakeplasma.jpg");
+		//Create a new camera node
+		camera = new CameraNode("camera");
+		camera.translate = [0, 15, 40];
+		camera.rotate = [-20, 0, 0];
+		if (debug) console.debug(camera);
+		
+		//Create a model node
+		model = new MeshNode("model");
+		var mesh = new Mesh("/assets/models/json/quakeplasma.json");
+		var shader = new Shader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
+		var texture = new Texture("/assets/textures/quakeplasma.jpg");
+		model.attachMesh(mesh);
+		model.attachShader(shader);
+		model.attachTexture(texture);
+		if (debug) console.debug(model);
+		
+		//Create the scene graph
+		sceneGraph = new SceneGraph();
+		//sceneGraph.rootNode.addChild(model);
+		sceneGraph.rootNode.addChild(camera);
+		
+		//Test function 
+		//sceneGraph.render();
+		
+		//Some fun, instance the model
+		
+		for (var i=0; i<5; i++){
+			instance = new MeshNode("instance" + i);
+			instance.attachMesh(mesh);
+			instance.attachShader(shader);
+			instance.attachTexture(texture);
+			instance.translate = [i*10 - 25, 0, 0];
+			sceneGraph.rootNode.addChild(instance);
+		}
+				
 		
 		//Start the animation
 		tick();
@@ -125,6 +157,8 @@
 	}
     
 
+	var t = 0.0;
+
 	/**
 	 * Main drawing routine
 	 */
@@ -138,18 +172,30 @@
 		projectionMatrixStack = new MatrixStack();
 		projectionMatrixStack.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);		
 		
-		//Set up ModelView Matrix
-		modelViewMatrixStack = new MatrixStack();
-		modelViewMatrixStack.translate([0.0, -3.0, -20.0]);
-		modelViewMatrixStack.rotate(20.0, [1,0,0]);
-		modelViewMatrixStack.rotate(cubeRotation, [0, 1, 0]);
+		//Rotate the model
+		model.rotate = [0.0, cubeRotation, 0.0];
 		
-		//Draw cube
-		cubeNode.render(projectionMatrixStack, modelViewMatrixStack);
+		//Rotate the instances
+		for (var i=0; i<5; i++){
+			sceneGraph.getNode("instance" + i).rotate = [0, cubeRotation, 0];
+		}
 		
-        //mvPopMatrix();
-		modelViewMatrixStack.pop();
+		sceneGraph.projectionMatrixStack = projectionMatrixStack;
+		
+		//Draw the scenegraph
+		sceneGraph.render();
+		
+		//Reset the modelview matrix stack
+		//sceneGraph.modelViewMatrixStack = new MatrixStack();
 
+		//Do the view transform
+		//camera.viewTransform();
+
+		//Draw the elements
+		//model.render();	
+		//sceneGraph.rootNode.render();
+		
+		
     }
 
 
