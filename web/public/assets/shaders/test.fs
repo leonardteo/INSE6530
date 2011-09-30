@@ -35,14 +35,12 @@ void main(void) {
 	//diffuseTerm = vec3(1.0, 1.0, 1.0) * clamp(dot(lightDirection, normal), 0.0, 1.0);
 	
 	//Calculate specular term
-	vec4 materialSpecularColor = vec4(1.0, 1.0, 1.0, 1.0);
-	vec4 lightSpecularColor = vec4(1.0, 1.0, 1.0, 1.0);
-	float shininess = 200.0;
+	vec4 materialSpecularColor = vec4(0.5, 0.5, 0.5, 1.0);	
+	vec4 lightSpecularColor = vec4(0.5, 0.5, 0.5, 1.0);	
+	
+	float shininess = 300.0;
 	vec4 specularTerm = materialSpecularColor * lightSpecularColor * pow( max(dot(normal, halfVector), 0.0), shininess);
 	
 	
-    gl_FragColor = diffuseTerm + specularTerm;
-	
-	//gl_FragColor = diffuseTerm;
-	
+	gl_FragColor = diffuseTerm + specularTerm;
 }

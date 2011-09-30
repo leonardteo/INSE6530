@@ -6,6 +6,8 @@
 
 <h1>Hello WebGL</h1>
 
+<p>Test of hierarchical scene graph. Shader uses blinn-phong per-fragment specular lighting.</p>
+
 <canvas id="webgl_canvas" style="border: none;" width="640" height="640"></canvas>
 
 <div style="padding-top:10px;">
@@ -50,26 +52,18 @@
 			
 			switch(modelName){
 				case 'm1abrams':
-					model = new MeshNode("model");
-					model.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 					model.loadMesh("/assets/models/json/m1abrams.json");
 					model.loadTexture("/assets/textures/m1abrams.jpg")
 					break;
 				case 'humveehardtop':
-					model = new MeshNode("model");
-					model.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 					model.loadMesh("/assets/models/json/humveehardtop.json");
 					model.loadTexture("/assets/textures/humveehardtop.jpg")
 					break;
 				case 'uhtiger':
-					model = new MeshNode("model");
-					model.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 					model.loadMesh("/assets/models/json/uhtiger.json");
 					model.loadTexture("/assets/textures/uhtiger.jpg")
 					break;
 				default:
-					model = new MeshNode("model");
-					model.loadShader("/assets/shaders/test.vs", "/assets/shaders/test.fs");
 					model.loadMesh("/assets/models/json/quakeplasma.json");
 					model.loadTexture("/assets/textures/quakeplasma.jpg")
 					
@@ -107,7 +101,7 @@
 		
 		//Create a new camera node
 		camera = new CameraNode("camera");
-		camera.translate = [0, 15, 40];
+		camera.translate = [0, 10, 20];
 		camera.rotate = [-20, 0, 0];
 		if (debug) console.debug(camera);
 		
@@ -123,22 +117,8 @@
 		
 		//Create the scene graph
 		sceneGraph = new SceneGraph();
-		//sceneGraph.rootNode.addChild(model);
+		sceneGraph.rootNode.addChild(model);
 		sceneGraph.rootNode.addChild(camera);
-		
-		//Test function 
-		//sceneGraph.render();
-		
-		//Some fun, instance the model
-		
-		for (var i=0; i<5; i++){
-			instance = new MeshNode("instance" + i);
-			instance.attachMesh(mesh);
-			instance.attachShader(shader);
-			instance.attachTexture(texture);
-			instance.translate = [i*10 - 25, 0, 0];
-			sceneGraph.rootNode.addChild(instance);
-		}
 				
 		
 		//Start the animation
@@ -175,26 +155,10 @@
 		//Rotate the model
 		model.rotate = [0.0, cubeRotation, 0.0];
 		
-		//Rotate the instances
-		for (var i=0; i<5; i++){
-			sceneGraph.getNode("instance" + i).rotate = [0, cubeRotation, 0];
-		}
-		
 		sceneGraph.projectionMatrixStack = projectionMatrixStack;
 		
 		//Draw the scenegraph
 		sceneGraph.render();
-		
-		//Reset the modelview matrix stack
-		//sceneGraph.modelViewMatrixStack = new MatrixStack();
-
-		//Do the view transform
-		//camera.viewTransform();
-
-		//Draw the elements
-		//model.render();	
-		//sceneGraph.rootNode.render();
-		
 		
     }
 

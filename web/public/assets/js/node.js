@@ -26,17 +26,13 @@ Node.prototype.addChild = function(childNode){
 	this.childNodes.push(childNode);
 }
 
+
 /**
  * Returns all the children as an array
  */
 Node.prototype.getChildren = function(){
 	return this.childNodes;
 }
-
-/**
- * Get the current modelviewmatrix stack
- */
-
 
 /**
  * renders the node
