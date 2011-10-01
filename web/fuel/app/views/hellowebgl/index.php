@@ -6,9 +6,16 @@
 
 <h1>Hello WebGL</h1>
 
-<p>Test of hierarchical scene graph. Shader uses blinn-phong per-fragment specular lighting.</p>
+<p>Description: Test of hierarchical scene graph. Shader uses blinn-phong per-fragment specular lighting.</p>
+<p>Usage: </p>
+<ul>
+	<li>Orbit: Left mouse button + move</li>
+	<li>Dolly: Right mouse button + move</li>
+	<li>Pan: Middle mouse button + move</li>
+</ul>
+<p>Note: Use <a href="http://www.google.com/chrome">Google Chrome</a> for best experience</p>
 
-<canvas id="webgl_canvas" style="border: none;" width="640" height="640"></canvas>
+<canvas id="webgl_canvas" width="900" height="600" oncontextmenu="return false;"></canvas>
 
 <div style="padding-top:10px;">
 	<label>Select a model to view:</label>
@@ -40,36 +47,20 @@
 	
 	var lastTime = 0;	
 	
-	var debug = false;	//ugh/
+	var debug = false;	
 	
+	//Mouse movements
+	var leftmousedown = false;
+	var rightmousedown = false;
+	var middlemousedown = false;
+	var mousedownX = 0.0;
+	var mousedowny = 0.0;
 	
 	//Start webGL when the DOM is ready...
 	jQuery(document).ready(function(){
-		main();
 		
-		jQuery('#model').change(function(obj){
-			modelName = jQuery('#model').val();
-			
-			switch(modelName){
-				case 'm1abrams':
-					model.loadMesh("/assets/models/json/m1abrams.json");
-					model.loadTexture("/assets/textures/m1abrams.jpg")
-					break;
-				case 'humveehardtop':
-					model.loadMesh("/assets/models/json/humveehardtop.json");
-					model.loadTexture("/assets/textures/humveehardtop.jpg")
-					break;
-				case 'uhtiger':
-					model.loadMesh("/assets/models/json/uhtiger.json");
-					model.loadTexture("/assets/textures/uhtiger.jpg")
-					break;
-				default:
-					model.loadMesh("/assets/models/json/quakeplasma.json");
-					model.loadTexture("/assets/textures/quakeplasma.jpg")
-					
-			}
-			
-		});
+		//And away we go!
+		main();
 		
 	});	
 
@@ -78,6 +69,10 @@
 	 */
 	function main(){
 		
+		//bind all interface
+		bindInterface();
+		
+		//Make the canvas BIG
 		updateStatus("Starting WebGL");
 		
 		var canvas = document.getElementById('webgl_canvas');
@@ -101,8 +96,11 @@
 		
 		//Create a new camera node
 		camera = new CameraNode("camera");
-		camera.translate = [0, 10, 20];
-		camera.rotate = [-20, 0, 0];
+		camera.translate = [0.0, 2.0, 0.0];
+		camera.fovy = 45.0;
+		camera.distance = 20;
+		camera.elevation = 30;
+		camera.azimuth = -30;
 		if (debug) console.debug(camera);
 		
 		//Create a model node
@@ -128,6 +126,104 @@
 		
 	}
 	
+	/**
+	 * Initialize the interface bindings
+	 */
+	function bindInterface(){
+		jQuery('#model').change(function(obj){
+			modelName = jQuery('#model').val();
+			
+			switch(modelName){
+				case 'm1abrams':
+					model.loadMesh("/assets/models/json/m1abrams.json");
+					model.loadTexture("/assets/textures/m1abrams.jpg")
+					break;
+				case 'humveehardtop':
+					model.loadMesh("/assets/models/json/humveehardtop.json");
+					model.loadTexture("/assets/textures/humveehardtop.jpg")
+					break;
+				case 'uhtiger':
+					model.loadMesh("/assets/models/json/uhtiger.json");
+					model.loadTexture("/assets/textures/uhtiger.jpg")
+					break;
+				default:
+					model.loadMesh("/assets/models/json/quakeplasma.json");
+					model.loadTexture("/assets/textures/quakeplasma.jpg")
+					
+			}
+			
+		});
+		
+		jQuery('#webgl_canvas').mousedown(function(e){
+			
+			switch (e.which){
+				case 1:	//left button
+					leftmousedown = true;
+					break;
+				case 2:	//middle button
+					middlemousedown = true;
+					break;
+				case 3:	//right button
+					rightmousedown = true;
+					break;
+			}
+			
+			mousedownX = e.clientX;
+			mousedownY = e.clientY;
+			
+			e.stopPropagation();
+			e.preventDefault();
+			return false;
+		});
+		
+		jQuery('#webgl_canvas').mouseup(function(e){
+			//Reset the offsets
+			switch (e.which){
+				case 1:	//left button
+					leftmousedown = false;
+					camera.elevation = camera.elevation + camera.elevationOffset;
+					camera.azimuth = camera.azimuth + camera.azimuthOffset;
+					camera.elevationOffset = 0.0;
+					camera.azimuthOffset = 0.0;					
+					break;
+				case 2:	//middle button
+					middlemousedown = false;
+					camera.panX = camera.panX + camera.panXOffset;
+					camera.panY = camera.panY + camera.panYOffset;
+					camera.panXOffset = 0.0;
+					camera.panYOffset = 0.0;
+					break;
+				case 3:	//right button
+					rightmousedown = false;
+					camera.distance = camera.distance + camera.distanceOffset;
+					camera.distanceOffset = 0.0;
+					break;
+			}
+			
+			return false;
+			
+		});
+		
+		jQuery('#webgl_canvas').mousemove(function(e){
+			if (leftmousedown){
+				//Set the camera movement
+				camera.elevationOffset = (e.clientY - mousedownY) / 2;
+				camera.azimuthOffset = (e.clientX - mousedownX) / 2;
+			}
+			
+			if (middlemousedown){
+				camera.panXOffset = (mousedownX - e.clientX) / 50;
+				camera.panYOffset = (e.clientY - mousedownY) /50;
+			}
+			
+			if (rightmousedown){
+				camera.distanceOffset = (mousedownX - e.clientX) / 20;
+			}
+			
+			return false;
+		});	
+	}
+	
 	
 	/**
 	 * Helper function for updating the status
@@ -144,21 +240,11 @@
 	 */
     function drawScene() {
 		
-		//Set the viewport
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		
-		//Set up projection matrix
-		projectionMatrixStack = new MatrixStack();
-		projectionMatrixStack.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);		
-		
 		//Rotate the model
-		model.rotate = [0.0, cubeRotation, 0.0];
-		
-		sceneGraph.projectionMatrixStack = projectionMatrixStack;
+		//model.rotate = [0.0, cubeRotation, 0.0];
 		
 		//Draw the scenegraph
-		sceneGraph.render();
+		sceneGraph.render("camera");
 		
     }
 

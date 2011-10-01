@@ -102,7 +102,7 @@ Shader.prototype.setUniforms = function(projectionMatrixStack, modelViewMatrixSt
 	gl.uniformMatrix4fv(this.program.modelViewMatrixUniform, false, modelViewMatrixStack.getTopMatrix());
 	
 	//Calculate normal matrix
-	normalMatrix = mat3.create();
+	var normalMatrix = mat3.create();
 	mat4.toInverseMat3(modelViewMatrixStack.getTopMatrix(), normalMatrix);
 	mat3.transpose(normalMatrix);
 		

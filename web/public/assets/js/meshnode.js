@@ -33,10 +33,8 @@ MeshNode.prototype.render = function(){
 	this.modelTransform();
 	
 	//Render any children....
-	if (this.childNodes.length > 0){	//Need this or Javascript goes into an endless loop!
-		for (var i=0; i<this.childNodes.length; i++){
-			this.childNodes[i].render();
-		}
+	for (var i=0; i<this.childNodes.length; i++){
+		this.childNodes[i].render();
 	}
 	
 	//Draw the model

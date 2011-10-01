@@ -33,7 +33,7 @@ MatrixStack.prototype.getTopMatrix = function(){
 MatrixStack.prototype.push = function(){
 	
 	//Clone the top matrix
-	clone = mat4.create(this.getTopMatrix());
+	var clone = mat4.create(this.getTopMatrix());
 	
 	this.m.push(clone);
 	
@@ -47,7 +47,7 @@ MatrixStack.prototype.pop = function(){
 	//If length is 1, 
 	if (this.m.length == 1){
 		this.m.pop();
-		identity = mat4.create();
+		var identity = mat4.create();
 		mat4.identity(identity);
 		this.m.push(identity);
 	} else {

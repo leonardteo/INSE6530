@@ -49,12 +49,11 @@ Node.prototype.render = function(projectionMatrixStack, modelViewMatrixStack){
 	
 	
 	//Render any children....
-	if (this.childNodes.length > 0){	//Need this or Javascript goes into an endless loop!
-		for (var i=0; i<this.childNodes.length; i++){
-			if (debug) console.log("Calling render on childnode: " + this.childNodes[i].id);
-			this.childNodes[i].render();
-		}
+	for (var i=0; i<this.childNodes.length; i++){
+		if (debug) console.log("Calling render on childnode: " + this.childNodes[i].id);
+		this.childNodes[i].render();
 	}
+
 	
 	this.sceneGraph.modelViewMatrixStack.pop();
 }
@@ -103,7 +102,7 @@ Node.prototype.viewTransform = function()
  */
 Node.prototype.getNode = function(name){
 	
-	strcomp = this.id.valueOf() == name.valueOf();	//Oh my word Javascript!!! You're more complex than I thought!
+	var strcomp = this.id.valueOf() == name.valueOf();	//Oh my word Javascript!!! You're more complex than I thought!
 	
 	//If found, return this object
 	if (strcomp) {
@@ -114,7 +113,7 @@ Node.prototype.getNode = function(name){
 	if (this.childNodes.length > 0){
 		
 		for (var i=0; i<this.childNodes.length; i++){
-			found = this.childNodes[i].getNode(name);
+			var found = this.childNodes[i].getNode(name);
 			//Quick escape
 			if (found){
 				return found;

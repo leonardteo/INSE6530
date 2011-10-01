@@ -14,13 +14,17 @@ function SceneGraph() {
 
 /**
  * Render the scenegraph
+ * @param string cameraID
  */
-SceneGraph.prototype.render = function render(){
+SceneGraph.prototype.render = function render(cameraID){
 	
 	if (debug) {
 		console.log("Calling scenegraph.render on scenegraph:");
 		console.debug(this);
 	}
+	
+	var camera = this.getNode(cameraID.valueOf());
+	camera.setProjection(gl.viewportWidth, gl.viewportHeight);
 	
 	//Reset the modelview matrix stack
 	this.modelViewMatrixStack = new MatrixStack();
