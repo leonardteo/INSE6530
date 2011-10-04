@@ -1,8 +1,36 @@
 
 body {
 	font-family: arial, sans-serif;
+	padding: 0px;
+	margin: 0px;
 }
 
+#header {
+	background-color: black;
+	height: 28px;
+}
+
+#header > #header_inner {
+	width: 1280px;
+	margin: 0px auto;
+	color: #f1f1f1;
+	padding-top: 5px;
+}
+
+#header > #header_inner a {
+	color: #ccc;
+}
+
+#header > #header_inner a:hover {
+	color: #f0f0f0;
+}
+
+#content {
+	width: 1280px;
+	padding-left: 20px;
+	padding-right: 20px;
+	margin: 0px auto;
+}
 
 /**
 Status - looks like a terminal
@@ -21,3 +49,5 @@ ul#status {
 ul#status > li {
 	list-style: none;
 }
+
+

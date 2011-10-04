@@ -50,12 +50,15 @@ Shader.prototype.link = function(){
 
     if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
         console.error("Could not initialise shaders");
-    }
+    } else {
+		this.initShaderVars();
+
+		//Set this programReady flag to true
+		this.programReady = true;	
+		
+		return false;
+	}
 	
-	this.initShaderVars();
-	
-	//Set this programReady flag to true
-	this.programReady = true;	
 	
 	return true;
 }
@@ -190,6 +193,8 @@ Shader.prototype.getAndCompileShader = function(url, type){
 		console.error(gl.getShaderInfoLog(shader));
 		return null;
 	}
+	
+	
 	
 	//Return the shader
 	return shader;

@@ -23,6 +23,7 @@
 		<script src="/assets/js/node.js"></script>
 		<script src="/assets/js/meshnode.js"></script>
 		<script src="/assets/js/texture.js"></script>
+		<script src="/assets/js/videotexture.js"></script>
 		<script src="/assets/js/cameranode.js"></script>
 		<script src="/assets/js/mesh.js"></script>
 		
@@ -36,10 +37,16 @@
 	</head>
 	
 	<body>
-	
-	
-		<?php echo $content; ?>
 		
+		<div id="header">
+			<div id="header_inner">
+				WebGL Experiments by <a href="http://www.leonardteo.com">Leonard Teo</a>.
+			</div>
+		</div>
+	
+		<div id="content">
+			<?php echo $content; ?>
+		</div>
 		
 	</body>
 	

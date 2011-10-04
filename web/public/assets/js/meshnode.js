@@ -12,6 +12,12 @@ function MeshNode(id){
 	//Call the parent constructor
 	Node.call(this, id);
 	
+	//Set the drawing by default to solid. Other setting is wireframe
+	this.drawMode = "solid";
+	
+	//Set texture to null;
+	this.texture = null;
+	
 }
 
 //Inherit the node
@@ -51,18 +57,22 @@ MeshNode.prototype.draw = function(){
 	//Set the shader program to use
 	gl.useProgram(this.shader.getProgram());
 	
-	//Set the texture
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, this.texture.gltexture);
+	//Set the texture if it exists
+	if (this.texture){
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, this.texture.gltexture);
+	} 
    
-	//Sent attributes to shader
+	//Send attributes to shader
 	this.shader.setAttributes(this.mesh.vertexBuffer, this.mesh.textureCoordBuffer, this.mesh.normalBuffer, this.mesh.indexBuffer);
 	
 	//Send matrices to shader	
 	this.shader.setUniforms(this.sceneGraph.projectionMatrixStack, this.sceneGraph.modelViewMatrixStack);
 	
-	//Draw
-	gl.drawElements(gl.TRIANGLES, this.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+	//Draw @todo FIX THIS
+	var glDrawMode = this.drawMode == "solid" ? gl.TRIANGLES : gl.LINESTRIP; 
+	
+	gl.drawElements(glDrawMode, this.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 		
 }
 
@@ -75,9 +85,21 @@ MeshNode.prototype.attachMesh = function(mesh){
 
 /**
  * Load an OBJ json model
+ * @param string url - url to the location of the JSON file
  */
-MeshNode.prototype.loadMesh = function(model){
-	this.mesh = new Mesh(model);
+MeshNode.prototype.loadMesh = function(url){
+	this.mesh = new Mesh();
+	this.mesh.loadMesh(url);
+}
+
+/**
+ * Load a plane into the meshnode
+ */
+MeshNode.prototype.loadPlane = function(scale){
+	
+	this.mesh = new Mesh();
+	this.mesh.loadPlane(scale);
+	
 }
 
 /**
