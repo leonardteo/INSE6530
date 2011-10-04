@@ -17,13 +17,15 @@
 
 <canvas id="webgl_canvas" width="640" height="480" oncontextmenu="return false;" style="float: left;"></canvas>
 
-<video id="video" width="256" height="256" controls loop style="float:left; padding-left: 20px;">
+<video id="video" width="256" height="256" controls loop="true" style="float:left; padding-left: 20px;">
 	<source src="/assets/movies/TestMovieCropResampled.webm" type="video/webm" />
-	<source src="/assets/movies/TestMovieCropResampled.theora.ogv" type="video/ogg" />
+	<source src="/assets/movies/TestMovieCropResampled.ogg" type="video/ogg" />
 	Your browser doesn't support HTML5 video
 </video>
 
 <div style="clear:both;"></div>
+
+<div>Time: <span id="currentTime"></span> seconds</div>
 
 <div>
 	<h2>Status:</h2>
@@ -33,9 +35,11 @@
 
 <h2>Development Notes</h2>
 
-<p>Currently does not work on Firefox and I cannot figure out why.</p>
-<p>Chrome textures need to be in powers of 2. Therefore, the video size is 256x256. It CANNOT be an arbitrary sized texture.</p>
-
+<ul>
+	<li>Firefox issue: The filename for an Ogg file in Firefox has to be .ogg. It was not working when the file was .ogv. Apparently the MIME type declaration doesn't do anything.</li>
+	<li>Firefox issue: This demo slows down the entire computer. There seems to be a memory leak somewhere.</li>
+	<li>Textures need to be in powers of 2. Therefore, the video size is 256x256. It CANNOT be an arbitrary sized texture.</li>
+</ul>
 
 
 <!-- Run time script -->
@@ -250,6 +254,7 @@
 		
 		//Update the video texture
 		model.texture.updateTexture();
+		jQuery('#currentTime').html(document.getElementById('video').currentTime);
 		
         var timeNow = new Date().getTime();
         if (lastTime != 0) {
